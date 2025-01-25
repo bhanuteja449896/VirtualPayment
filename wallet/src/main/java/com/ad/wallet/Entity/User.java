@@ -1,7 +1,10 @@
 package com.ad.wallet.Entity;
 
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import java.util.List;
 
+@Document(collection = "users")
 public class User {
     private String name;
     private String mobile;

@@ -1,6 +1,7 @@
 package com.ad.wallet.vo;
 
-public class TransactionStatus {
+public class Login {
+
     private String desc;
     private String rc;
 

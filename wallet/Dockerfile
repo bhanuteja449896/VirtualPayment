@@ -1,28 +1,29 @@
-# Stage 1: Build the application using Maven
-FROM maven:3.9.4-eclipse-temurin-21 AS build
+# Use Maven to build the application
+FROM maven:3.9.4-eclipse-temurin-21 as builder
 
-# Set the working directory inside the container
+# Set the working directory
 WORKDIR /app
 
-# Copy the Maven descriptor file and download dependencies (cache layer)
-COPY pom.xml ./
-RUN mvn dependency:go-offline -B
+# Copy the pom.xml file into the working directory
+COPY wallet/pom.xml ./
 
-# Copy the source code and build the application
-COPY src ./src
+# Copy the src directory into the working directory
+COPY wallet/src ./src
+
+# Run Maven to build the project
 RUN mvn clean package -DskipTests
 
-# Stage 2: Create a lightweight runtime image
+# Stage 2: Create the runtime image
 FROM openjdk:21-jdk-slim
 
-# Set the working directory inside the container
+# Set the working directory in the runtime image
 WORKDIR /app
 
-# Copy the built JAR file from the build stage
-COPY --from=build /app/target/*.jar app.jar
+# Copy the built jar from the builder stage
+COPY --from=builder /app/target/*.jar app.jar
 
-# Expose the port your application runs on
+# Expose the port the application will run on
 EXPOSE 8080
 
-# Command to run the application
-CMD ["java", "-jar", "app.jar"]
+# Run the application
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]

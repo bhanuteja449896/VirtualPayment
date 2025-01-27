@@ -69,16 +69,4 @@ public class UserServices {
         return user;
     }
 
-//    public User updateUserBalance(String mobile, String newBalance) {
-//        User user = userRepository.findByMobile(mobile);
-//        if (user != null) {
-//            user.setBalance(newBalance);
-//            userRepository.save(user);  // This may cause a new user to be inserted if no matching ID is found
-//            return user;
-//        }
-//        return null;
-//    }
-
-
-
 }

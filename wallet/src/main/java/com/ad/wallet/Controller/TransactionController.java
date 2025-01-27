@@ -28,37 +28,61 @@ public class TransactionController {
     }
 
     @GetMapping("pay/{sender}/{receiver}/{amount}")
-    public TransactionStatus addNewTransaction(
-            @PathVariable("sender") String sender,
-            @PathVariable("receiver") String receiver,
-            @PathVariable("amount") String amount) {
-
+    public TransactionStatus addNewTransaction(@PathVariable("sender") String sender, @PathVariable("receiver") String receiver, @PathVariable("amount") String amount) {
         TransactionStatus transactionStatus = new TransactionStatus();
         User senderUser = userServices.findUserData(sender);
         User receiverUser = userServices.findUserData(receiver);
 
-        if (receiverUser == null) {
+        // Validate sender
+        if (senderUser == null) {
             transactionStatus.setRc("01");
+            transactionStatus.setDesc("Sender Not Found");
+            return transactionStatus;
+        }
+
+        // Validate receiver
+        if (receiverUser == null) {
+            transactionStatus.setRc("02");
             transactionStatus.setDesc("Receiver Not Found");
             return transactionStatus;
         }
 
-        int senderBalance = Integer.parseInt(senderUser.getBalance());
-        int transferAmount = Integer.parseInt(amount);
+        int senderBalance;
+        try {
+            senderBalance = Integer.parseInt(senderUser.getBalance());
+        } catch (NumberFormatException e) {
+            transactionStatus.setRc("03");
+            transactionStatus.setDesc("Invalid Balance Format for Sender");
+            System.out.println("Error: Invalid balance format for sender " + sender);  // Debug log
+            return transactionStatus;
+        }
 
+        int transferAmount;
+        try {
+            transferAmount = Integer.parseInt(amount);
+        } catch (NumberFormatException e) {
+            transactionStatus.setRc("04");
+            transactionStatus.setDesc("Invalid Amount Format");
+            System.out.println("Error: Invalid transfer amount format");  // Debug log
+            return transactionStatus;
+        }
+
+        // Check sender's balance
         if (senderBalance < transferAmount) {
-            transactionStatus.setRc("02");
+            transactionStatus.setRc("05");
             transactionStatus.setDesc("Insufficient Balance");
             return transactionStatus;
         }
 
-        // Update sender and receiver balances
-        senderUser.setBalance(String.valueOf(senderBalance - transferAmount));
-        receiverUser.setBalance(String.valueOf(Integer.parseInt(receiverUser.getBalance()) + transferAmount));
+        // Update balances
+        boolean isSenderUpdated = userServices.updateUserBalance(sender, String.valueOf(senderBalance - transferAmount));
+        boolean isReceiverUpdated = userServices.updateUserBalance(receiver, String.valueOf(Integer.parseInt(receiverUser.getBalance()) + transferAmount));
 
-        // Save updated user data
-//        userServices.updateUser(senderUser);
-//        userServices.updateUser(receiverUser);
+        if (!isSenderUpdated || !isReceiverUpdated) {
+            transactionStatus.setRc("06");
+            transactionStatus.setDesc("Error Updating Balances");
+            return transactionStatus;
+        }
 
         // Create transaction entries
         Transaction senderTransaction = new Transaction();
@@ -70,19 +94,29 @@ public class TransactionController {
         senderTransaction.setTimestamp(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 
         Transaction receiverTransaction = new Transaction();
-        receiverTransaction.setSender(receiver);
-        receiverTransaction.setReceiver(sender);
+        receiverTransaction.setSender(sender);
+        receiverTransaction.setReceiver(receiver);
         receiverTransaction.setAmount(amount);
         receiverTransaction.setStatus("Success");
         receiverTransaction.setType("Credit");
         receiverTransaction.setTimestamp(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        try {
+            transactionServices.addTransaction(senderTransaction);
+            transactionServices.addTransaction(receiverTransaction);
+        } catch (Exception e) {
+            transactionStatus.setRc("06");
+            transactionStatus.setDesc("Error saving transaction");
+            System.out.println("Error saving transaction: " + e.getMessage());  // Debug log
+            return transactionStatus;
+        }
 
-        // Save transactions
-        transactionServices.addTransaction(senderTransaction);
-        transactionServices.addTransaction(receiverTransaction);
-
+        // Successful transaction
         transactionStatus.setRc("00");
         transactionStatus.setDesc("Transaction Successful");
+//        transactionStatus.setTimestamp(transaction.getTransactionId());
         return transactionStatus;
     }
+
+
 }
+

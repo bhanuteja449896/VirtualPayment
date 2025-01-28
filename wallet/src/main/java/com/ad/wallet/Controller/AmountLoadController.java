@@ -7,10 +7,7 @@ import com.ad.wallet.Services.AmountLoadServices;
 import com.ad.wallet.Services.UserServices;
 import com.ad.wallet.vo.TransactionStatus;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -18,12 +15,15 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/load/")
+@CrossOrigin(origins = "*")
 public class AmountLoadController {
     @Autowired
     private AmountLoadServices amountLoadServices;
 
     @Autowired
     private UserServices userServices;
+
+
 
     @GetMapping("{mobile}/{amount}")
     public TransactionStatus addLoadAmount(@PathVariable("mobile") String mobile, @PathVariable("amount") String amount){

@@ -95,8 +95,8 @@ public class TransactionController {
         senderTransaction.setTimestamp(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 
         Transaction receiverTransaction = new Transaction();
-        receiverTransaction.setSender(sender);
-        receiverTransaction.setReceiver(receiver);
+        receiverTransaction.setSender(receiver);
+        receiverTransaction.setReceiver(sender);
         receiverTransaction.setAmount(amount);
         receiverTransaction.setStatus("Success");
         receiverTransaction.setType("Credit");

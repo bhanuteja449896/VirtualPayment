@@ -48,6 +48,12 @@ public class TransactionController {
             return transactionStatus;
         }
 
+        if( senderUser == receiverUser ){
+            transactionStatus.setDesc("Sender and Receiver should not be same");
+            transactionStatus.setRc("07");
+            return transactionStatus;
+        }
+
         int senderBalance;
         try {
             senderBalance = Integer.parseInt(senderUser.getBalance());

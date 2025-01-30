@@ -48,7 +48,7 @@ public class TransactionController {
             return transactionStatus;
         }
 
-        if( sender == receiver ){
+        if( sender.equals(receiver) ){
             transactionStatus.setDesc("Sender and Receiver should not be same");
             transactionStatus.setRc("07");
             return transactionStatus;

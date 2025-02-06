@@ -19,7 +19,7 @@ public class AdminController {
     private AdminServices adminServices;
 
     @GetMapping("login/{mobile}/{password}")
-    public Login AdminLogin(String mobile,String password){
+    public Login AdminLogin(@PathVariable("mobile") String mobile,@PathVariable("password") String password){
         Login login = new Login();
         Admin admin = adminServices.findAdminData(mobile);
         if(admin==null){

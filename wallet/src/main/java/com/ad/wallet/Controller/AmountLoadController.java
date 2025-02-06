@@ -54,7 +54,7 @@ public class AmountLoadController {
         amountLoad.setTimestamp(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         amountLoadServices.LoadUserAccount(amountLoad);
         transactionStatus.setRc("00");
-        transactionStatus.setDesc("Amount Loaded Successfully");
+        transactionStatus.setDesc("Amount Redeemed Successfully");
         return transactionStatus;
 
     }

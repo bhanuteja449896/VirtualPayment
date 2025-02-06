@@ -8,5 +8,7 @@ import java.util.List;
 
 @Repository
 public interface AmountLoadRepository extends MongoRepository<AmountLoad, String> {
+    @Query("{'admin': ?0}")
+    List<AmountLoad> findByAdmin(String mobile);
     List<AmountLoad> findByMobile(String mobile);
 }

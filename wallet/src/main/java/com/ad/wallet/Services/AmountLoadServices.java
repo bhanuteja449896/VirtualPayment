@@ -23,4 +23,9 @@ public class AmountLoadServices {
         return transactions;
     }
 
+    public List<AmountLoad> getUserLoadAmountDataByMobile(String mobile){
+        List<AmountLoad> transactions = amountLoadRepository.findByMobile(mobile);
+        return transactions;
+    }
+
 }

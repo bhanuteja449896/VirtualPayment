@@ -98,7 +98,7 @@ public class AmountLoadController {
         return amountLoadServices.getLoadAmountDataByMobile(mobile);
     }
 
-    @GetMapping("admin/transaction/{mobile}")
+    @GetMapping("user/load/transaction/{mobile}")
     public List<AmountLoad> getAllUserTransactionsByMobile(@PathVariable("mobile") String mobile){
         return amountLoadServices.getUserLoadAmountDataByMobile(mobile);
     }

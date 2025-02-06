@@ -19,7 +19,7 @@ public class AmountLoadServices {
     }
 
     public List<AmountLoad> getLoadAmountDataByMobile(String mobile){
-        List<AmountLoad> transactions = amountLoadRepository.findByMobile(mobile);
+        List<AmountLoad> transactions = amountLoadRepository.findByAdmin(mobile);
         return transactions;
     }
 

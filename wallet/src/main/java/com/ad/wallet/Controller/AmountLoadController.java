@@ -14,7 +14,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
-@RequestMapping("/load/")
+@RequestMapping("/")
 @CrossOrigin(origins = "*")
 public class AmountLoadController {
     @Autowired
@@ -23,10 +23,44 @@ public class AmountLoadController {
     @Autowired
     private UserServices userServices;
 
+    @GetMapping("redeem/{admin}/{mobile}/{amount}")
+    public TransactionStatus redeemAmount(@PathVariable("admin") String admin ,@PathVariable("mobile") String mobile, @PathVariable("amount") String amount){
+        TransactionStatus transactionStatus = new TransactionStatus();
+        AmountLoad amountLoad = new AmountLoad();
+        User user = userServices.findUserData(mobile);
+        if(user == null){
+            transactionStatus.setRc("01");
+            transactionStatus.setDesc("User Not found");
+            return transactionStatus;
+        }
+        int redeemAmount = Integer.parseInt(user.getBalance());
+        if(redeemAmount< Integer.parseInt(amount)){
+            transactionStatus.setRc("02");
+            transactionStatus.setDesc("Insufficient balance");
+            return transactionStatus;
+        }
+        redeemAmount = redeemAmount - Integer.parseInt(amount);
+        boolean isSenderUpdated = userServices.updateUserBalance(mobile,String.valueOf(redeemAmount));
+        if(!isSenderUpdated){
+            transactionStatus.setRc("02");
+            transactionStatus.setDesc("Error Loading Balances");
+            return transactionStatus;
+        }
 
+        amountLoad.setMobile(mobile);
+        amountLoad.setAmount(amount);
+        amountLoad.setType("Debit");
+        amountLoad.setAdmin(admin);
+        amountLoad.setTimestamp(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        amountLoadServices.LoadUserAccount(amountLoad);
+        transactionStatus.setRc("00");
+        transactionStatus.setDesc("Amount Loaded Successfully");
+        return transactionStatus;
 
-    @GetMapping("{mobile}/{amount}")
-    public TransactionStatus addLoadAmount(@PathVariable("mobile") String mobile, @PathVariable("amount") String amount){
+    }
+
+    @GetMapping("load/{admin}/{mobile}/{amount}")
+    public TransactionStatus addLoadAmount(@PathVariable("admin") String admin,@PathVariable("mobile") String mobile, @PathVariable("amount") String amount){
         TransactionStatus transactionStatus = new TransactionStatus();
         AmountLoad amountLoad = new AmountLoad();
         User user = userServices.findUserData(mobile);
@@ -50,6 +84,8 @@ public class AmountLoadController {
 
         amountLoad.setMobile(mobile);
         amountLoad.setAmount(amount);
+        amountLoad.setType("Credit");
+        amountLoad.setAdmin(admin);
         amountLoad.setTimestamp(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         amountLoadServices.LoadUserAccount(amountLoad);
         transactionStatus.setRc("00");
@@ -57,7 +93,7 @@ public class AmountLoadController {
         return transactionStatus;
     }
 
-    @GetMapping("transaction/{mobile}")
+    @GetMapping("admin/transaction/{mobile}")
     public List<AmountLoad> getAllLoadTransactionsByMobile(@PathVariable("mobile") String mobile){
         return amountLoadServices.getLoadAmountDataByMobile(mobile);
     }

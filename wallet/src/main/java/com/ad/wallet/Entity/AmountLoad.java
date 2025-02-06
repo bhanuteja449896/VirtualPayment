@@ -7,7 +7,25 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class AmountLoad {
     private String mobile;
     private String amount;
+    private String type;
     private String timestamp;
+    private String admin;
+
+    public String getAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(String admin) {
+        this.admin = admin;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 
     public String getMobile() {
         return mobile;
